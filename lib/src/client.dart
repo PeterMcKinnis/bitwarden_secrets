@@ -10,18 +10,23 @@ final DynamicLibrary bitwardenLib = Platform.isWindows
 
 // Define the types for the C functions
 typedef InitFunc = Pointer<Void> Function(Pointer<Utf8> clientSettings);
-typedef RunCommandFunc = Pointer<Utf8> Function(Pointer<Utf8> command, Pointer<Void> client);
+typedef RunCommandFunc = Pointer<Utf8> Function(
+    Pointer<Utf8> command, Pointer<Void> client);
 
 // Create Dart function pointers for the C functions
-final InitFunc _init = bitwardenLib.lookup<NativeFunction<InitFunc>>('init').asFunction();
-final RunCommandFunc _runCommand = bitwardenLib.lookup<NativeFunction<RunCommandFunc>>('run_command').asFunction();
+final InitFunc _init =
+    bitwardenLib.lookup<NativeFunction<InitFunc>>('init').asFunction();
+final RunCommandFunc _runCommand = bitwardenLib
+    .lookup<NativeFunction<RunCommandFunc>>('run_command')
+    .asFunction();
 
 typedef FreeMemFunc = Void Function(Pointer<Void> client);
 typedef FreeMemFuncDart = void Function(Pointer<Void> client);
-final FreeMemFuncDart _freeMem = bitwardenLib.lookup<NativeFunction<FreeMemFunc>>('free_mem').asFunction<FreeMemFuncDart>();
+final FreeMemFuncDart _freeMem = bitwardenLib
+    .lookup<NativeFunction<FreeMemFunc>>('free_mem')
+    .asFunction<FreeMemFuncDart>();
 
 class BitwardenClient {
-
   Pointer<Void> clientPtr;
 
   BitwardenClient._(this.clientPtr);
@@ -54,9 +59,7 @@ class BitwardenClient {
   }
 }
 
-
 class BitwardenClientSettings {
-  
   // Constructor
   BitwardenClientSettings({
     required this.apiUrl,
@@ -73,7 +76,6 @@ class BitwardenClientSettings {
   String userAgent;
   int deviceType;
 
-
   // toJson function
   Map<String, dynamic> toJson() {
     return {
@@ -83,7 +85,6 @@ class BitwardenClientSettings {
       'deviceType': deviceType,
     };
   }
-
 }
 
 // See

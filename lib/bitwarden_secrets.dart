@@ -7,13 +7,13 @@ import 'dart:convert';
 import 'package:bitwarden_secrets/src/client.dart';
 
 class BitwardenSecrets {
-  BitwardenSecrets(String organizationId, {String? identityUrl, String? apiUrl}) : _organizationId = organizationId,
-    _client = BitwardenClient(BitwardenClientSettings(
-        apiUrl: apiUrl,
-        identityUrl: identityUrl,
-        userAgent: "Bitwarden DART-SDK",
-        deviceType: windows_desktop_device_type));
-
+  BitwardenSecrets(String organizationId, {String? identityUrl, String? apiUrl})
+      : _organizationId = organizationId,
+        _client = BitwardenClient(BitwardenClientSettings(
+            apiUrl: apiUrl,
+            identityUrl: identityUrl,
+            userAgent: "Bitwarden DART-SDK",
+            deviceType: windows_desktop_device_type));
 
   final BitwardenClient _client;
   final String _organizationId;
@@ -39,10 +39,17 @@ class BitwardenSecrets {
     }
   }
 
-  Secret secretCreate(String key, String value, String projectId, {String note = ""}) {
+  Secret secretCreate(String key, String value, String projectId,
+      {String note = ""}) {
     var command = {
       "secrets": {
-        "create": {"_organizationId": _organizationId, "key": key, "value": value, "projectIds": [projectId], "note": note}
+        "create": {
+          "_organizationId": _organizationId,
+          "key": key,
+          "value": value,
+          "projectIds": [projectId],
+          "note": note
+        }
       }
     };
     var json = _checkResponse(_client.runCommand(jsonEncode(command)));
@@ -52,7 +59,9 @@ class BitwardenSecrets {
   void secretDelete(String secretId) {
     var command = {
       "secrets": {
-        "delete": {"ids": [secretId]}
+        "delete": {
+          "ids": [secretId]
+        }
       }
     };
     _checkResponse(_client.runCommand(jsonEncode(command)));
@@ -67,7 +76,8 @@ class BitwardenSecrets {
     _checkResponse(_client.runCommand(jsonEncode(command)));
   }
 
-  Secret secretUpdate(Secret secret, {String? key, String? value, String? note, String? projectId}) {
+  Secret secretUpdate(Secret secret,
+      {String? key, String? value, String? note, String? projectId}) {
     var command = {
       "secrets": {
         "update": {
@@ -102,7 +112,9 @@ class BitwardenSecrets {
       }
     };
     var json = _checkResponse(_client.runCommand(jsonEncode(command)));
-    return (json["data"]).map<SecretHeader>((e) => SecretHeader.fromJson(e)).toList();
+    return (json["data"])
+        .map<SecretHeader>((e) => SecretHeader.fromJson(e))
+        .toList();
   }
 
   Project projectCreate(String name) {
@@ -164,7 +176,9 @@ class BitwardenSecrets {
       }
     };
     var json = _checkResponse(_client.runCommand(jsonEncode(command)));
-    return (json["data"] as List<Object?>).map((e) => Project.fromJson(e as Map<String, Object?>)).toList();
+    return (json["data"] as List<Object?>)
+        .map((e) => Project.fromJson(e as Map<String, Object?>))
+        .toList();
   }
 }
 
@@ -229,7 +243,6 @@ class SecretHeader {
   final String id;
   final String organizationId;
   final String key;
-
 
   SecretHeader({
     required this.id,
