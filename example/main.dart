@@ -12,7 +12,7 @@ void main() {
   bws.accessTokenLogin(accessToken, statePath: "temp.txt");
 
   // Create a project and secret
-  var project = bws.projectCreate("Temp");
+  var project = bws.projectCreate("foo-project");
   var secret = bws.secretCreate("foo-api-Key", "xxxx-xxxx-xxxxxxx", project.id);
 
   // List Secrets

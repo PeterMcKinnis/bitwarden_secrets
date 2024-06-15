@@ -1,5 +1,5 @@
 name: bitwarden_secrets
-description: Unoficial driver of the Bitwarden secrets Manager
+description: Unoficial driver of the Bitwarden Secrets SDK.  Bitwarden Secrets Manager enables developers and DevOps teams to centrally store, manage, and deploy secrets at scale. 
 version: 1.0.0
 repository: https://github.com/PeterMcKinnis/bitwarden_secrets
 

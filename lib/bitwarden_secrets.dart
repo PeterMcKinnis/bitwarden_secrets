@@ -17,6 +17,7 @@ class BitwardenSecrets {
   final BitwardenClient _client;
   final String _organizationId;
 
+  /// Logs in using an access token.  Access token can be generated using the bitwarden web valut.  https://vault.bitwarden.com/
   void accessTokenLogin(String accessToken, {String? statePath}) {
     var command = {
       "accessTokenLogin": {
@@ -38,6 +39,7 @@ class BitwardenSecrets {
     }
   }
 
+  /// Create a secret
   Secret secretCreate(String key, String value, String projectId,
       {String note = ""}) {
     var command = {
@@ -55,6 +57,7 @@ class BitwardenSecrets {
     return Secret.fromJson(json);
   }
 
+  /// Delete a secret
   void secretDelete(String secretId) {
     var command = {
       "secrets": {
@@ -66,6 +69,7 @@ class BitwardenSecrets {
     _checkResponse(_client.runCommand(jsonEncode(command)));
   }
 
+  /// Delete multiple secrets
   void secretDeleteList(List<String> secretIds) {
     var command = {
       "secrets": {
@@ -75,6 +79,7 @@ class BitwardenSecrets {
     _checkResponse(_client.runCommand(jsonEncode(command)));
   }
 
+  /// Update a secret.  A null arguement for key, value, note, or project id will cause the existing value to be retained.
   Secret secretUpdate(Secret secret,
       {String? key, String? value, String? note, String? projectId}) {
     var command = {
@@ -94,6 +99,7 @@ class BitwardenSecrets {
     return Secret.fromJson(json);
   }
 
+  // Lookup secret details
   Secret secretGet(String secretId) {
     var command = {
       "secrets": {
@@ -104,6 +110,7 @@ class BitwardenSecrets {
     return Secret.fromJson(json);
   }
 
+  /// Lookup all secrets.  Note only the SecretHeader is returned.  Use [secretGet] to retrieve the value and other details.
   List<SecretHeader> secretList() {
     var command = {
       "secrets": {
@@ -116,6 +123,7 @@ class BitwardenSecrets {
         .toList();
   }
 
+  /// Creat a project
   Project projectCreate(String name) {
     var command = {
       "projects": {
@@ -127,6 +135,7 @@ class BitwardenSecrets {
     return Project.fromJson(json);
   }
 
+  /// Delete multiple projects
   void projectDeleteList(List<String> projectIds) {
     var command = {
       "projects": {
@@ -138,10 +147,12 @@ class BitwardenSecrets {
     _checkResponse(_client.runCommand(jsonEncode(command)));
   }
 
+  /// Delete a project
   void projectDelete(String projectId) {
     projectDeleteList([projectId]);
   }
 
+  /// Update the name of a project
   Project projectUpdate(String projectId, String name) {
     var command = {
       "projects": {
@@ -156,6 +167,7 @@ class BitwardenSecrets {
     return Project.fromJson(json);
   }
 
+  /// Lookup a project
   Project projectGet(String projectId) {
     var command = {
       "projects": {
@@ -168,6 +180,7 @@ class BitwardenSecrets {
     return Project.fromJson(json);
   }
 
+  /// List all projects
   List<Project> projectList() {
     var command = {
       "projects": {
