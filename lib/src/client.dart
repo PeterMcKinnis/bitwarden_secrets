@@ -87,6 +87,4 @@ class BitwardenClientSettings {
   }
 }
 
-// See
-// https://github.com/bitwarden/sdk/blob/32ac1e477a5578ac039031c76920bc295fbc1c38/crates/bitwarden-api-api/src/models/device_type.rs
-const int windows_desktop_device_type = 6;
+

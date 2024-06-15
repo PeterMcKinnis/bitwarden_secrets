@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:bitwarden_secrets/bitwarden_secrets.dart';
 import 'package:test/test.dart';
 

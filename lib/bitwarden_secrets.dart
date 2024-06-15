@@ -1,10 +1,9 @@
-/// Support for doing something awesome.
-///
-/// More dartdocs go here.
-library;
-
 import 'dart:convert';
 import 'package:bitwarden_secrets/src/client.dart';
+
+// See
+// https://github.com/bitwarden/sdk/blob/32ac1e477a5578ac039031c76920bc295fbc1c38/crates/bitwarden-api-api/src/models/device_type.rs
+const int bwsWindowsDesktopDeviceType = 6;
 
 class BitwardenSecrets {
   BitwardenSecrets(String organizationId, {String? identityUrl, String? apiUrl})
@@ -13,7 +12,7 @@ class BitwardenSecrets {
             apiUrl: apiUrl,
             identityUrl: identityUrl,
             userAgent: "Bitwarden DART-SDK",
-            deviceType: windows_desktop_device_type));
+            deviceType: bwsWindowsDesktopDeviceType));
 
   final BitwardenClient _client;
   final String _organizationId;
