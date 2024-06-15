@@ -13,7 +13,7 @@ and the Flutter guide for
 
 # Bitwarden Secrets
 
-Unoficial driver of the (Bitwarden secrets Manager SDK)[https://bitwarden.com/help/secrets-manager-sdk/]
+Unoficial driver of the [Bitwarden secrets Manager SDK](https://bitwarden.com/help/secrets-manager-sdk/)
 
 # Example
 
@@ -28,11 +28,11 @@ Unoficial driver of the (Bitwarden secrets Manager SDK)[https://bitwarden.com/he
   bws.accessTokenLogin(accessToken, statePath: "temp.txt");
 
   // Create a project and secret
-  var project = bws.projectCreate("Temp");
+  var project = bws.projectCreate("my-project");
   var secret = bws.secretCreate("foo-api-Key", "xxxx-xxxx-xxxxxxx", project.id);
 
   // List Secrets
-  List<SecretHeader>  secrets = bws.secretList();
+  List<SecretHeader> secrets = bws.secretList();
 
   // List Projects
   List<Project> projects = bws.projectList();
