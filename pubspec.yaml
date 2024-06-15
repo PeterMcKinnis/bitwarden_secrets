@@ -1,0 +1,17 @@
+name: bitwarden_secrets
+description: Unoficial driver of the Bitwarden secrets Manager
+version: 1.0.0
+# repository: https://github.com/my_org/my_repo
+
+platforms:
+  windows: 
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  ffi: ^2.0.0
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.0.0
