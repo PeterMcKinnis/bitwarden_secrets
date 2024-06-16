@@ -14,9 +14,7 @@ void main() {
     bws.accessTokenLogin(accessToken);
 
     // Delete all 'Temp' projects
-    for (var p in bws
-        .projectList()
-        .where((e) => e.name.startsWith("Temp"))) {
+    for (var p in bws.projectList().where((e) => e.name.startsWith("Temp"))) {
       bws.projectDelete([p.id]);
     }
     var n = bws.projectList().length;
@@ -52,8 +50,7 @@ void main() {
     var p6 = bws.projectCreate("Temp");
     var p7 = bws.projectCreate("Temp2");
     var s1 = bws.secretCreate("Key1", "Value", p6.id);
-    var s2 =
-        bws.secretCreate("Key2", "Value", p6.id, note: "my note");
+    var s2 = bws.secretCreate("Key2", "Value", p6.id, note: "my note");
     var s3 = bws.secretCreate("Key3", "Value", p6.id);
 
     // Secret Get

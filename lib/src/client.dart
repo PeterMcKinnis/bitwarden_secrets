@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
-import 'dart:io';
 import 'package:ffi/ffi.dart';
-
-
 
 // Define the types for the C functions
 typedef InitFunc = Pointer<Void> Function(Pointer<Utf8> clientSettings);
@@ -13,18 +10,19 @@ typedef FreeMemFunc = Void Function(Pointer<Void> client);
 typedef FreeMemFuncDart = void Function(Pointer<Void> client);
 
 class BitwardenClient {
-
   BitwardenClient._(this._freeMem, this._runCommand, this.clientPtr);
 
   final FreeMemFuncDart _freeMem;
   final RunCommandFunc _runCommand;
   Pointer<Void> clientPtr;
 
-
-  factory BitwardenClient(DynamicLibrary bitwardenLib, BitwardenClientSettings settings) {
-    InitFunc init = bitwardenLib.lookup<NativeFunction<InitFunc>>('init').asFunction();
+  factory BitwardenClient(
+      DynamicLibrary bitwardenLib, BitwardenClientSettings settings) {
+    InitFunc init =
+        bitwardenLib.lookup<NativeFunction<InitFunc>>('init').asFunction();
     FreeMemFuncDart freeMem = bitwardenLib
-        .lookup<NativeFunction<FreeMemFunc>>('free_mem').asFunction();
+        .lookup<NativeFunction<FreeMemFunc>>('free_mem')
+        .asFunction();
     RunCommandFunc runCommand = bitwardenLib
         .lookup<NativeFunction<RunCommandFunc>>('run_command')
         .asFunction();

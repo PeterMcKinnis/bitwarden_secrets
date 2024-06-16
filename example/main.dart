@@ -3,7 +3,6 @@ import 'dart:ffi';
 import 'dart:io';
 import 'package:bitwarden_secrets/bitwarden_secrets.dart';
 
-
 void main() {
   var accessToken = "<your access token>";
   var organizationId = "<your organization id>";
@@ -15,7 +14,7 @@ void main() {
   bws.accessTokenLogin(accessToken);
 
   // Create a project and secret
-  var project = bws.projectCreate( "foo-project");
+  var project = bws.projectCreate("foo-project");
   var secret = bws.secretCreate("foo-api-Key", "xxxx-xxxx-xxxxxxx", project.id);
 
   // List Secrets

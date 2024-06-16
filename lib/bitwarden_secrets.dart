@@ -7,14 +7,16 @@ import 'package:bitwarden_secrets/src/client.dart';
 const int bwsWindowsDesktopDeviceType = 6;
 
 class BitwardenSecrets {
-  BitwardenSecrets( String organizationId, DynamicLibrary bitwardenLib, {String? identityUrl, String? apiUrl})
+  BitwardenSecrets(String organizationId, DynamicLibrary bitwardenLib,
+      {String? identityUrl, String? apiUrl})
       : _organizationId = organizationId,
-      _client = BitwardenClient(bitwardenLib, 
-        BitwardenClientSettings(
-            apiUrl: apiUrl,
-            identityUrl: identityUrl,
-            userAgent: "Bitwarden DART-SDK",
-            deviceType: "SDK"));
+        _client = BitwardenClient(
+            bitwardenLib,
+            BitwardenClientSettings(
+                apiUrl: apiUrl,
+                identityUrl: identityUrl,
+                userAgent: "Bitwarden DART-SDK",
+                deviceType: "SDK"));
 
   final BitwardenClient _client;
   final String _organizationId;
@@ -46,7 +48,8 @@ class BitwardenSecrets {
 
   /// Create a secret
   /// As of 6/16/2024 new secrets may not have multiple projectIds
-  Secret secretCreate(String key, String value, String projectId, {String? note}) {
+  Secret secretCreate(String key, String value, String projectId,
+      {String? note}) {
     var command = {
       "secrets": {
         "create": {
