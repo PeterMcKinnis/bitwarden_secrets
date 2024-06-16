@@ -1,7 +1,0 @@
-## Clone the BWS repo and build
-
-```
-git clone https://github.com/bitwarden/sdk.git
-cd sdk
-cargo build --release -p bitwarden-c
-```

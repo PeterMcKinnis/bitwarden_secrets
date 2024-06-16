@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:bitwarden_secrets/src/client.dart';
 
 // See
@@ -6,19 +7,23 @@ import 'package:bitwarden_secrets/src/client.dart';
 const int bwsWindowsDesktopDeviceType = 6;
 
 class BitwardenSecrets {
-  BitwardenSecrets(String organizationId, {String? identityUrl, String? apiUrl})
+  BitwardenSecrets( String organizationId, DynamicLibrary bitwardenLib, {String? identityUrl, String? apiUrl})
       : _organizationId = organizationId,
-        _client = BitwardenClient(BitwardenClientSettings(
+      _client = BitwardenClient(bitwardenLib, 
+        BitwardenClientSettings(
             apiUrl: apiUrl,
             identityUrl: identityUrl,
             userAgent: "Bitwarden DART-SDK",
-            deviceType: bwsWindowsDesktopDeviceType));
+            deviceType: "SDK"));
 
   final BitwardenClient _client;
   final String _organizationId;
 
   /// Logs in using an access token.  Access token can be generated using the bitwarden web valut.  https://vault.bitwarden.com/
-  void accessTokenLogin(String accessToken, {String? statePath}) {
+  /// Note that this function may return successfully even with a bad or expired accessToken.  Use projectList or similar to
+  /// ensure credentials are working
+  AccessTokenLoginResponse accessTokenLogin(String accessToken,
+      {String? statePath}) {
     var command = {
       "accessTokenLogin": {
         "accessToken": accessToken,
@@ -26,8 +31,8 @@ class BitwardenSecrets {
       }
     };
 
-    var raw = _checkResponse(_client.runCommand(jsonEncode(command)));
-    print(raw);
+    var json = _checkResponse(_client.runCommand(jsonEncode(command)));
+    return AccessTokenLoginResponse.fromJson(json);
   }
 
   Map<String, dynamic> _checkResponse(String raw) {
@@ -40,16 +45,16 @@ class BitwardenSecrets {
   }
 
   /// Create a secret
-  Secret secretCreate(String key, String value, String projectId,
-      {String note = ""}) {
+  /// As of 6/16/2024 new secrets may not have multiple projectIds
+  Secret secretCreate(String key, String value, String projectId, {String? note}) {
     var command = {
       "secrets": {
         "create": {
-          "_organizationId": _organizationId,
+          "organizationId": _organizationId,
           "key": key,
           "value": value,
           "projectIds": [projectId],
-          "note": note
+          "note": note ?? ""
         }
       }
     };
@@ -57,20 +62,8 @@ class BitwardenSecrets {
     return Secret.fromJson(json);
   }
 
-  /// Delete a secret
-  void secretDelete(String secretId) {
-    var command = {
-      "secrets": {
-        "delete": {
-          "ids": [secretId]
-        }
-      }
-    };
-    _checkResponse(_client.runCommand(jsonEncode(command)));
-  }
-
   /// Delete multiple secrets
-  void secretDeleteList(List<String> secretIds) {
+  void secretDelete(List<String> secretIds) {
     var command = {
       "secrets": {
         "delete": {"ids": secretIds}
@@ -80,13 +73,13 @@ class BitwardenSecrets {
   }
 
   /// Update a secret.  A null arguement for key, value, note, or project id will cause the existing value to be retained.
-  Secret secretUpdate(Secret secret,
+  Secret secretEdit(Secret secret,
       {String? key, String? value, String? note, String? projectId}) {
     var command = {
       "secrets": {
         "update": {
           "id": secret.id,
-          "_organizationId": _organizationId,
+          "organizationId": secret.organizationId,
           "key": key ?? secret.key,
           "value": value ?? secret.value,
           "note": note ?? secret.note,
@@ -110,16 +103,29 @@ class BitwardenSecrets {
     return Secret.fromJson(json);
   }
 
-  /// Lookup all secrets.  Note only the SecretHeader is returned.  Use [secretGet] to retrieve the value and other details.
-  List<SecretHeader> secretList() {
+  // Lookup secret details
+  List<Secret> secretGetByIds(List<String> secretIds) {
     var command = {
       "secrets": {
-        "list": {"_organizationId": _organizationId}
+        "get": {"ids": secretIds}
+      }
+    };
+    var json = _checkResponse(_client.runCommand(jsonEncode(command)));
+    return (json["data"] as List<dynamic>)
+        .map((e) => Secret.fromJson(e))
+        .toList();
+  }
+
+  /// Lookup all secrets.  Note only the SecretIdentifier is returned.  Use [secretGet] to retrieve the value and other details.
+  List<SecretIdentifier> secretList() {
+    var command = {
+      "secrets": {
+        "list": {"organizationId": _organizationId}
       }
     };
     var json = _checkResponse(_client.runCommand(jsonEncode(command)));
     return (json["data"])
-        .map<SecretHeader>((e) => SecretHeader.fromJson(e))
+        .map<SecretIdentifier>((e) => SecretIdentifier.fromJson(e))
         .toList();
   }
 
@@ -127,7 +133,7 @@ class BitwardenSecrets {
   Project projectCreate(String name) {
     var command = {
       "projects": {
-        "create": {"name": name, "_organizationId": _organizationId}
+        "create": {"name": name, "organizationId": _organizationId}
       }
     };
 
@@ -136,7 +142,7 @@ class BitwardenSecrets {
   }
 
   /// Delete multiple projects
-  void projectDeleteList(List<String> projectIds) {
+  void projectDelete(List<String> projectIds) {
     var command = {
       "projects": {
         "delete": {
@@ -147,19 +153,14 @@ class BitwardenSecrets {
     _checkResponse(_client.runCommand(jsonEncode(command)));
   }
 
-  /// Delete a project
-  void projectDelete(String projectId) {
-    projectDeleteList([projectId]);
-  }
-
   /// Update the name of a project
-  Project projectUpdate(String projectId, String name) {
+  Project projectEdit(Project project, {String? name}) {
     var command = {
       "projects": {
         "update": {
-          "_organizationId": _organizationId,
-          "id": projectId,
-          "name": name,
+          "organizationId": _organizationId,
+          "id": project.id,
+          "name": name ?? project.name,
         }
       }
     };
@@ -184,7 +185,7 @@ class BitwardenSecrets {
   List<Project> projectList() {
     var command = {
       "projects": {
-        "list": {"_organizationId": _organizationId}
+        "list": {"organizationId": _organizationId}
       }
     };
     var json = _checkResponse(_client.runCommand(jsonEncode(command)));
@@ -251,19 +252,19 @@ class Secret {
   }
 }
 
-class SecretHeader {
+class SecretIdentifier {
   final String id;
   final String organizationId;
   final String key;
 
-  SecretHeader({
+  SecretIdentifier({
     required this.id,
     required this.organizationId,
     required this.key,
   });
 
-  factory SecretHeader.fromJson(Map<String, dynamic> json) {
-    return SecretHeader(
+  factory SecretIdentifier.fromJson(Map<String, dynamic> json) {
+    return SecretIdentifier(
       id: json['id'],
       organizationId: json['organizationId'],
       key: json['key'],
@@ -293,6 +294,29 @@ class Project {
       name: json['name'],
       creationDate: DateTime.parse(json['creationDate']),
       revisionDate: DateTime.parse(json['revisionDate']),
+    );
+  }
+}
+
+class AccessTokenLoginResponse {
+  AccessTokenLoginResponse({
+    required this.authenticated,
+    required this.resetMasterPassword,
+    required this.forcePasswordReset,
+    required this.twoFactor,
+  });
+
+  bool authenticated;
+  bool resetMasterPassword;
+  bool forcePasswordReset;
+  Object? twoFactor;
+
+  factory AccessTokenLoginResponse.fromJson(Map<String, dynamic> json) {
+    return AccessTokenLoginResponse(
+      authenticated: json['authenticated'],
+      resetMasterPassword: json['resetMasterPassword'],
+      forcePasswordReset: json['forcePasswordReset'],
+      twoFactor: json['twoFactor'],
     );
   }
 }
