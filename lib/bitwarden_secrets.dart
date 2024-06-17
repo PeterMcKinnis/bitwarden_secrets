@@ -6,6 +6,7 @@ import 'package:bitwarden_secrets/src/client.dart';
 // https://github.com/bitwarden/sdk/blob/32ac1e477a5578ac039031c76920bc295fbc1c38/crates/bitwarden-api-api/src/models/device_type.rs
 const int bwsWindowsDesktopDeviceType = 6;
 
+/// The main class used to authenticate, query, and edit Bitwarden Secrets objects
 class BitwardenSecrets {
   BitwardenSecrets(String organizationId, DynamicLibrary bitwardenLib,
       {String? identityUrl, String? apiUrl})
@@ -220,6 +221,7 @@ class _Response {
   }
 }
 
+/// The result of several Bitwarden Secrets queries such as [SessionGet] and [SessionList]
 class Secret {
   final String id;
   final String organizationId;
@@ -275,6 +277,7 @@ class SecretIdentifier {
   }
 }
 
+/// The result of several Bitwarden Project queries such as [ProjectGet] and [ProjectList]
 class Project {
   final String id;
   final String organizationId;
@@ -301,6 +304,7 @@ class Project {
   }
 }
 
+/// Holds the response to [AuthTokenLogin]
 class AccessTokenLoginResponse {
   AccessTokenLoginResponse({
     required this.authenticated,
